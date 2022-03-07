@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html>
+  <title>Active Sidewalk Shed Permits</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="https://nycdob.github.io/ActiveNB_A1enlargements/keen/keen-dashboards.css" />
+  <link href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css' rel='stylesheet' type='text/css'/>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.12/r-2.1.0/se-1.2.0/datatables.min.css">
+  <link href="https://nycdob.github.io/ActiveNB_A1enlargements/build/nv.d3.css" rel="stylesheet" type="text/css">
+  <style>
+
+.filterTableButton {
+	margin-right:5px;
+}
+#riskTable_info{
+	font-weight:bolder !important;
+}
+.row{
+	padding-top: 50px;
+}
+body {
+	background-color: white;
+}
+.jobno{
+	margin-left: 20px;
+}
+#map {
+	height: 100%;
+	width: 100%;
+	background-color: #333;
+	pointer-events: all;
+}
+#table-container{
+	height: 890px;
+	width: 100%;
+	display: block;
+	background-color: white;
+}
+#img{
+	float: left;
+	height: 35px;
+	margin-left: 10px;
+	padding-right: 10px;
+}
+
+#riskTable{
+	height: 100%;
+	font-size: 11px;
+}
+
+
+td.details-control {
+	background: url('https://datatables.net/examples/resources/details_open.png') no-repeat center center;
+	cursor: pointer;
+}
+tr.shown td.details-control {
+	background: url('https://datatables.net/examples/resources/details_close.png') no-repeat center center;
+	cursor: pointer;
+}
+
+
+.logo{
+	/* background-image: url('data/dob_transparent_highres.png'); */
+	background-image: url('https://raw.githubusercontent.com/NYCDOB/CommunityProfiles_v2/gh-pages/dob_logo_white_transparent.png');
+	background-repeat: no-repeat;
+	background-position: center;
+	float: right;
+	background-size: 80px;
+	height: 50px;
+	width: 110px;	  
+}
+.pointShed{
+	fill: #547A95;
+	fill-opacity: .5;
+	stroke: #fff;
+
+}
+
+.tooltipSheds {
+	color: #222;
+	background: #fff;
+	padding: .5em;
+	text-shadow: #f5f5f5 0 1px 0;
+	border-radius: 7px; 
+	box-shadow: 0px 0px 2px 0px #a6a6a6; 
+	opacity: 0.9; 
+	position: absolute;
+	visibility: hidden;
+}
+
+.dataTables_empty {
+  display:none;
+}
+.asofDate{
+	font-size:16px;
+}
+
+
+@media( max-width:1200px){
+	.dobmain	{
+		padding-top:50px;
+	}
+	.legendShed {
+		visibility:hidden;
+	}
+	.legendCD {
+		visibility:hidden;
+	}
+	.ui {
+		margin-top: -150px;
+	}
+}
+
+@media ( max-width:2100px){
+	.summarytxt_sheds {
+		font-size: 12px !important;
+	}
+	.summarytxt_avgAge {
+		font-size: 12px !important;
+	}
+	.summarytxt_feet {
+		font-size: 12px !important;
+	}
+	#summary1_sheds {
+		font-size: 25px !important;
+	}
+	#summary2_avgAge {
+		font-size: 25px !important;
+	}
+	#summary3_feet {
+		font-size: 25px !important;
+	}
+	.summarytxt {
+		font-size: 12px !important;
+	}
+}
+
+.dataTables_filter input { width: 150px }
+
+#loadpage{
+	margin: auto;
+	padding-top: 300px;
+}
+#button-wrapper {
+	position: absolute;
+	top: 20px;
+	left: 60px;
+	padding: 15px;
+	border-radius: 5px;
+	background-color: rgba(192,192,192,0.9);
+	border: 2px solid white;
+}
+.btnStyle {
+	border-radius: 5px;
+	background-color: white;
+	border: 1px solid #7a7a7a;
+	color: black;
+	font-size: 13px;
+	font-weight: bold;
+	padding: 4px;
+	width: 100%;
+	
+}
+
+svg {
+	display: block;
+}
+
+
+#chart-01{
+    box-sizing: border-box;
+    width: 100%;
+	<!-- height: 150px; -->
+	height: 100%;
+    <!-- border: 0.5px solid gray; -->
+    float: left;
+	background-color: #c7c7c7;
+	<!-- margin: 0px 0px 12px; -->
+}
+#chart-02{
+    box-sizing: border-box;
+    width: 100%;
+	<!-- height: 150px; -->
+	height: 100%;
+    <!-- border: 0.5px solid gray; -->
+    float: left;
+	background-color: #c7c7c7;
+	<!-- margin: 0px 0px 12px; -->
+}#chart-03{
+    box-sizing: border-box;
+    width: 100%;
+	<!-- height: 150px; -->
+	height: 100%;
+    <!-- border: 0.5px solid gray; -->
+    float: left;
+	background-color: #c7c7c7;
+	<!-- margin: 0px 0px 12px; -->
+}
+#chart-boro-sheds{
+    box-sizing: border-box;
+    width: 100%;
+	height: 180px;
+	/* height: 100%; */
+    float: left;
+	background-color: #c7c7c7;
+	margin-bottom: 10px;
+}
+#borosheds{
+	margin-top: 10px;
+	padding: 0px;
+	height: 150px;
+	width: 100%;
+	background-color: #fff;
+}
+
+#cdsheds{
+	margin-top: 10px;
+	padding: 0px;
+	height: 140px;
+	width: 100%;
+	background-color: #fff;
+}
+
+#shedApp{
+	margin-top: 10px;
+	padding: 0px;
+	height: 170px;
+	width: 100%;
+	background-color: #fff;
+}
+
+#chart-cd{
+    box-sizing: border-box;
+    width: 100%;
+	height: 200px;
+    <!-- border: 0.5px solid gray; -->
+    float: left;
+	background-color: #c7c7c7;
+	<!-- margin: 0px 0px 12px; -->
+}
+
+#chart-app{
+    box-sizing: border-box;
+    width: 100%;
+	height: 230px;
+    <!-- border: 0.5px solid gray; -->
+    float: left;
+	background-color: #c7c7c7;
+	<!-- margin: 0px 0px 12px; -->
+}
+.summarytxt{
+	font-size: 20px;
+	font-weight: bold;
+	color: #FFFFFF;
+	font-family: 'Open Sans', sans-serif; 
+	font-family: 'Roboto', sans-serif;
+	text-align: center;
+	line-height: 97%;
+	padding-top: 10px;
+}
+.summarytxt_sheds{
+	font-size: 20px;
+	font-weight: bold;
+	color: #FFFFFF;
+	font-family: 'Open Sans', sans-serif;
+	font-family: 'Roboto', sans-serif;
+	text-align: center;
+	line-height: 97%;
+	padding-top: 5px;
+}
+.summarytxt_avgAge{
+	font-size: 20px;
+	font-weight: bold;
+	color: #FFFFFF;
+	font-family: 'Open Sans', sans-serif;
+	font-family: 'Roboto', sans-serif;
+	text-align: center;
+	line-height: 97%;
+	padding-top: 5px;
+}
+.summarytxt_feet{
+	font-size: 20px;
+	font-weight: bold;
+	color: #FFFFFF;
+	font-family: 'Open Sans', sans-serif;
+	font-family: 'Roboto', sans-serif;
+	text-align: center;
+	line-height: 97%;
+	padding-top: 5px;
+}
+.subtxt{
+	font-size: 15px;
+	font-style: italic;
+	color: #FFFFFF;
+	font-family: 'Open Sans', sans-serif;
+	font-family: 'Roboto', sans-serif;
+	text-align: center;
+	<!-- line-height: 97%; -->
+	<!-- padding-top: 10px; -->
+}
+#summary1_sheds{
+	font-size: 35px;
+	font-weight: bold;
+	color: #547A95;
+	font-family: 'Open Sans', sans-serif;
+	font-family: 'Roboto', sans-serif;	
+	text-align: center;
+	line-height: 125%;
+	
+}
+#summary2_avgAge{
+	font-size: 35px;
+	font-weight: bold;
+	color: #547A95;
+	font-family: 'Open Sans', sans-serif;
+	font-family: 'Roboto', sans-serif;	
+	text-align: center;
+	line-height: 125%;
+	
+}
+#summary3_feet{
+	font-size: 35px;
+	font-weight: bold;
+	color: #547A95;
+	font-family: 'Open Sans', sans-serif;
+	font-family: 'Roboto', sans-serif;	
+	text-align: center;
+	line-height: 125%;
+	
+}
+.nv-x text{
+	margin-top: 50px;
+	font-size: 10px;
+	fill: #547A95;
+}
+.form-check label {
+	font: 14px/16px Arial, Helvetica, sans-serif;
+	margin: 10px;	
+	vertical-align: middle;
+	/* font-variant: small-caps; */
+}
+
+.legendShed {
+		padding: 6px 10px;
+		font: 14px/16px Arial, Helvetica, sans-serif;
+		background: white;
+		background: rgba(255,255,255,0.8);
+		border: 2px solid #707070;
+		box-shadow: 0 0 15px rgba(0,0,0,0.2);
+		border-radius: 7px;
+		width: 160px;
+
+}
+.legendCD {
+		padding: 6px 10px;
+		font: 14px/16px Arial, Helvetica, sans-serif;
+		background: white;
+		background: rgba(255,255,255,0.8);
+		border: 2px solid #707070;
+		box-shadow: 0 0 15px rgba(0,0,0,0.2);
+		border-radius: 7px;
+		width: 160px;
+
+
+}
+.legendCD i {
+		width: 15px;
+		height: 15px;
+		float: left;
+		margin-right: 8px;
+		opacity: 1;
+}
+#legendTitleCD {
+		text-align: center;
+		margin-bottom: 15px;
+		font-variant: small-caps;
+		font-size: 15px;
+		font-weight: bold;
+}
+.symbolsContainerCD {
+		float: left;
+		margin-left: 50px;
+}
+
+
+#legendTitleSQFT {
+		text-align: center;
+		margin-bottom: 15px;
+		font-variant: small-caps;
+		font-size: 15px;
+		font-weight: bold;
+}
+.symbolsContainerSQFT {
+		float: left;
+		margin-left: 50px;
+}
+.legendCircleSQFT {
+		border-radius: 50%;
+		border: 1px solid #fff;
+		/* background: rgba(0, 159, 255, .4); */
+		background: rgba(84, 122, 149, .4);
+		display: inline-block;
+}
+.legendValueSQFT {
+		position: absolute;	
+		right: 8px;
+}
+
+.ui {
+	top: 225px;
+	left: 12px;
+	padding: 8px;
+	position: absolute;
+	background: white;
+	background: rgba(255,255,255,0.8);
+	border: 2px solid #707070;
+	box-shadow: 0 0 15px rgba(0,0,0,0.2);
+	border-radius: 7px;
+	width: 200px;
+}
+.form-check {
+	filter: grayscale(1);
+}
+#cdtxt {
+	line-height: 20px;
+}
+</style>
+<body>
+<div class="container">
+			<div class="navbar navbar-fixed-top" role="navigation" style="color:white;background-color:RGB(61,74,87);">
+			<a class="logo" href="https://www1.nyc.gov/site/buildings/index.page" target="_blank"> </a>
+				<div class="nav navbar-nav" style="margin-left:15px;margin-top:10px;font-size:26px;font-weight:bold;text-align:center;">
+					ACTIVE SIDEWALK SHED PERMITS
+				</div>
+			</div>
+</div>
+<div class="container-fluid dobmain" style="margin-top:20px;">
+	<div class="row">
+		  <div class="col-lg-9" style="height:89vh">
+			  <div class="chart-stage" id="map-container" style="border:1px solid black;height:100%;width:100%">
+				<div id="map">
+				<svg></svg>
+					<div id="ui-container" class="ui" style="z-index: 401">
+					  <form id="radioBox">
+						<div>
+						  <div class="form-check">
+							<input type="radio" class="form-check-input" name="o" value="radioShed" id="radioShed" checked>
+							<label class="form-check-label" for="radioShed">Active Sheds by Age</label>
+						  </div>
+						  <div class="form-check">
+							<input type="radio" class="form-check-input" name="o" value="radioCD" id="radioCD">
+							<label class="form-check-label" for="radioCD" id="cdtxt">Community Districts</br>(Choropleth Map)</label>
+						  </div>
+						</div>
+					  </form>	
+					</div>
+				</div>
+			  </div>
+		  </div>
+			  <div class="col-lg-3" style="height:100%">
+				<div class="newchart" style="padding:5px 5px 0px 5px;border:1px solid black;height:100%;width:100%;">
+					<div class="chart-wrapper">
+					  <div class="chart-stage" id="chart-01">
+						<div class="summarytxt_sheds" ># ACTIVE SHEDS: </br>
+							<span id="summary1_sheds"></span>
+						</div>
+					  </div>
+					</div>
+					<div class="chart-wrapper">
+						<div class="chart-stage" id="chart-02">
+						  <div class="summarytxt_avgAge" >AVERAGE AGE (DAYS): </br>
+							  <span id="summary2_avgAge"></span>
+						  </div>
+						</div>
+					</div>
+					<div class="chart-wrapper">
+						<div class="chart-stage" id="chart-03">
+							<div class="summarytxt_feet" >TOTAL LINEAR FEET: </br>
+								<span id="summary3_feet"></span>
+							</div>
+						</div>
+					</div>
+					<div class="chart-wrapper">
+					  <div class="chart-stage" id="chart-boro-sheds">
+						<svg id="borosheds"></svg>
+					  </div>
+					</div>
+					<div class="chart-wrapper">
+					  <div class="chart-stage" id="chart-cd">
+						<div class="summarytxt" >TOP 5 COMMUNITY DISTRICTS </br><span id="summary3"></span></div>
+						<svg id="cdsheds"></svg>
+					  </div>
+					</div>
+					<div class="chart-wrapper">
+					  <div class="chart-stage" id="chart-app">
+						<div class="summarytxt" >TOP 5 ACTIVE SHED APPLICANTS </br><span id="summary4"></span></div>
+						<svg id="shedApp"></svg>
+					  </div>
+					</div>
+				</div>
+			  </div>
+	</div>
+	<p class="small text-muted" style=" position:relative; bottom:0px;">Built by DOB Analytics <a href="https://www1.nyc.gov/site/buildings/dob/analytics-reports.page" target="_blank">Dev Squad</a> | This map shows the location of all actively permitted sidewalk sheds and is updated daily. <a id="dlData" href="no-script.html">Download Data (csv)</a></p>	
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.9/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-format@3"></script>
+<script src="https://nycdob.github.io/EssentialActiveConstruction/Leaflet.D3SvgOverlay-master/L.D3SvgOverlay.min.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://cdn.datatables.net/v/dt/dt-1.10.12/r-2.1.0/se-1.2.0/datatables.min.js"  type="text/javascript" charset="utf8" ></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js"></script>
+<script src="https://nycdob.github.io/ActiveNB_A1enlargements/build/nv.d3.js"></script>
+<script src="https://d3js.org/d3-time-format.v2.min.js"></script>
+<script type="text/javascript" src="https://nycdob.github.io/ActiveNB_A1enlargements/keen/keen.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/rowgroup/1.1.1/js/dataTables.rowGroup.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.6/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.html5.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/plug-ins/1.10.20/api/fnSortNeutral.js"></script>
+<script>
+
+$(document).ready(function(){
+	var today = new Date();
+	var dd = today.getDate();
+	var mm = today.getMonth()+1;
+	var yyyy = today.getFullYear();
+	today = mm + '/' + dd + '/' + yyyy;	
+	d3.select("#today").html(today);
+	var latlong = [];
+	var selection = [];
+	var formatDate = d3.time.format("%-m/%-d/%Y").parse;
+	var numberFormat = d3.format(",.0f");
+	var legendNumFormat = d3.format(",");
+    L.Control.include({
+      _refocusOnMap: L.Util.falseFn // Do nothing.
+    });	
+var map = L.map('map').setView([40.713312, -73.977407], 14);
+L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png', {attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
+
+
+var tooltipSheds = d3.select('#map').append('div')//var tooltip = d3.select('body').append('div')
+	.on('mouseover', function(d, i){
+		tooltipSheds.transition().duration(0);
+	})
+	.on('mouseout', function(d, i){
+		tooltipSheds.transition().delay(500).style('visibility', 'hidden');
+	})
+	.attr('class', 'tooltipSheds');
+	
+
+	
+var width = $("#map").width(),
+	height = $("#map").height(),
+	points = [],
+	table_map = [],
+	filteredData,
+	latLngs = [],
+	pointsOverlaySQFT,
+	legendShed,
+	legendCD,
+	cat,
+	cdSheds,
+	sheds_CD,
+	radius;
+	
+onload = ready();
+
+	
+function ready(){
+
+	pointsOverlaySQFT = L.d3SvgOverlay(function(sel,proj){
+		var pointsUpdSQFT = sel.selectAll('circle').data(points);
+		var maxAge = d3.max(points.map(function(d) { return d.age }));
+		var minAge = d3.min(points.map(function(d) { return d.age }));
+
+
+		console.log(maxAge);
+		console.log(minAge);
+
+		createLegend(minAge,maxAge);
+		createLegendCD(minAge,maxAge);
+		
+		
+		radius = d3.scale.sqrt()
+			.domain([0, maxAge])
+			.range([2, 30])
+				
+
+		function calcPropRadius(attributeValue) {
+
+			return Math.pow(attributeValue/2000,1/2)*100;
+		}
+
+
+		function createLegendCD(minLabel, maxLabel) {
+			
+			legendCD = L.control( { position: "topleft" } );
+			var classBreaks = [1,50,100,250,400];
+			var colorHex = ['#D8EAED','#285578'];
+			legendCD.onAdd = function (map) {
+				
+				var div = L.DomUtil.create('div', 'legendCD');
+				$(div).append("<p id='legendTitleCD'># Active Sheds</p>");
+				div.innerHTML += '<i style="background: #dddcdc;"></i>0<br>';
+				classBreaks.push(999); // add dummy class to extend to get last class color, chroma only returns class.length - 1 colors
+				for (var i = 0; i < classBreaks.length; i++) {
+					if (i+2 === classBreaks.length) {
+						div.innerHTML += '<i style="background: ' + getColor(classBreaks[i], classBreaks, colorHex) + ';"></i> ' +
+						classBreaks[i] + '+';
+						break
+					} else {
+						div.innerHTML += '<i style="background: ' + getColor(classBreaks[i], classBreaks, colorHex) + ';"></i> ' +
+						classBreaks[i] + '&ndash;' + classBreaks[i+1] + '<br>';
+					}
+				}
+				
+				return div;
+				
+			};	
+			
+			function getColor(n,classBreaks,colorHex) {
+				console.log(n,classBreaks,colorHex);
+				var mapScale = chroma.scale(colorHex).classes(classBreaks);
+				if (n === 0) {
+					var regionColor = '#dddcdc';
+				} else { 
+					var regionColor = mapScale(n).hex();
+				}
+				return regionColor
+			}	
+		}
+
+		
+		function createLegend(minLabel, maxLabel) {
+			
+			legendShed = L.control( { position: "topleft" } );
+			
+			legendShed.onAdd = function(map) {
+				var legendContainer = L.DomUtil.create("div", "legendShed");
+				var symbolsContainerSQFT = L.DomUtil.create("div", "symbolsContainerSQFT");
+				var classes = [14, 174, 362];
+				var classesLegendVals = [legendNumFormat(minLabel), legendNumFormat(Math.round((maxLabel-minLabel)/2)), legendNumFormat(maxLabel)];
+				
+				var legendCircleSQFT;
+				var lastRadius = 0;
+				var currentRadius;
+				var margin;
+				
+				L.DomEvent.addListener(legendContainer, "mousedown", function(e) {
+					L.DomEvent.stopPropagation(e);
+				});
+				
+				$(legendContainer).append("<p id='legendTitleSQFT'>Age (# of Days)</p>");
+				
+				for (var i = 0; i <= classes.length-1; i++) {
+					legendCircleSQFT = L.DomUtil.create("div", "legendCircleSQFT");
+					currentRadius = calcPropRadius(classes[i]);
+					margin = -currentRadius - lastRadius - 2;
+					
+					$(legendCircleSQFT).attr("style", "width: " + currentRadius*2 +
+							"px; height: " + currentRadius*2 +
+							"px; margin-left: " + margin + "px" );
+					
+					$(legendCircleSQFT).append("<span class='legendValueSQFT'>"+classesLegendVals[i]+"</span>");
+					
+					$(symbolsContainerSQFT).append(legendCircleSQFT);
+					
+					lastRadius = currentRadius;
+					console.log(classes[i]);
+				}
+				
+				$(legendContainer).append(symbolsContainerSQFT);
+				
+				return legendContainer;
+		
+				
+				};	
+		}
+
+		
+		pointsUpdSQFT.enter()
+			.append('circle')		
+			.attr("bin",function(d){return d["BIN Number"]})
+			.attr('cx',function(d){return proj.latLngToLayerPoint(d.latLng).x;})
+			.attr('cy',function(d){return proj.latLngToLayerPoint(d.latLng).y;})
+			.attr('class', function(d){
+				return "pointShed";
+			})
+			.on('click', function(d){
+			
+				if(d3.select(this).style("fill-opacity") != 0){
+					tooltipSheds.style("visibility", "visible");
+					tooltipSheds.html(
+						'JOB NUMBER: ' + d["Job Number"] + '</br>' +
+						'BIN: ' + d.bin + '</br>' +								
+						'ADDRESS: '+ d.houseNum + ' ' + d.street + ', ' + d.Borough + '</br>' +
+						'BLOCK: ' + d.block + '</br>' +	
+						'LOT: ' + d.lot + '</br>' +	
+						'COMMUNITY DISTRICT: ' + d.CD + '</br>' +
+						'FIRST PERMIT DATE: ' + d.firstPermitDate + '</br>' +
+						'CURRENT DATE: ' + d.currentDate + '</br>' +
+						'AGE (DAYS): ' + d.age + '</br>' +
+						'PERMIT EXPIRATION DATE: ' + d.expirationDate + '</br>' +
+						'SIDEWALK SHED/LINEAR FEET: ' + d.shedFeet + '</br>' +
+						'CONSTRUCTION MATERIAL: ' + d.constMat + '</br>' +
+						'APPLICANT BUSINESS NAME: ' + d.appName + '</br>' +
+						'ACTIVITY: ' + d.activity + '</br>'
+					)
+					if (d3.event.pageX > (width - 200)) {
+					   tooltipSheds.style("left", (d3.event.pageX - 350) + "px");
+					} else {
+					   tooltipSheds.style("left", (d3.event.pageX + 20) + "px")
+							.style("top", (d3.event.pageY -30) + "px");
+					}
+					if (d3.event.pageY > (height - 150)) {
+					   tooltipSheds.style("top", (d3.event.pageY -100) + "px");
+					} else {
+					   tooltipSheds.style("top", (d3.event.pageY -30) + "px");
+					}
+				}
+
+			})
+			.on("mouseover", function(d, i){
+				tooltipSheds.transition().duration(0); 
+				$(this).attr("style", "cursor: pointer; fill: #eef442; fill-opacity: 0.5;");			
+			})
+			.on("mouseout", function(d, i){			
+				$(this).attr("style", 	"fill: #547A95; fill-opacity: 0.5;" );
+				return tooltipSheds.transition().delay(500).style("visibility", "hidden");
+			});
+			
+			pointsUpdSQFT.attr("r", function(d) { return radius(d.age  / proj.scale); });
+			pointsUpdSQFT.attr("stroke-width", 1 / proj.scale);
+			
+				
+		
+	});
+	
+	
+	d3.csv("https://nycdob.github.io/Maps/data/Active_Sheds2.csv",function(data){
+				points = data.filter(function(d) {
+					if( !isNaN(+d["Latitude Point"]) && !isNaN(+d["Longitude Point"]) ) {
+						return d;
+					}
+				}).map(function(d){
+				d.latLng = [+d["Latitude Point"],+d["Longitude Point"]];
+				d.bin = d["BIN Number"];
+				d.houseNum = d["House Number"];
+				d.street = d["Street Name"];
+				d.CD = d["Community Board"];
+				d.Borough = d["Borough Name"].toUpperCase();
+				d.jobNum = d["Job Number"];
+				d.block = [d.Block];
+				d.lot = [d.Lot];
+				d.age = +d["Age"];
+				d.firstPermitDate = d["First Permit Date"];
+				d.currentDate = d["Current Date"];
+				d.expirationDate = d["Permit Expiration Date"];
+				d.shedFeet = d["Sidewalk Shed/Linear Feet"];
+				d.constMat = d["Construction Material"];
+				d.activity = [d.activity];
+				d.appName = d["Applicant Business Name"];
+			return d;
+			});
+			
+
+			$.getJSON("data/CommunityDistricts.json",function(json){
+
+				var ageByCD = d3.nest()
+					.key(function(d) { return d.CD; })
+					.rollup(function(v) {
+						return v.length;
+					})			
+					.entries(data)
+					console.log(ageByCD);
+
+				for(var i = 0; i < ageByCD.length; i++){
+					var commDist = ageByCD[i].key;
+					var shedValue = ageByCD[i].values;
+
+					for(var j = 0; j < json.features.length; j++){
+						var jsonCD = json.features[j].properties.boro_cd;
+
+						if(commDist == jsonCD){
+							json.features[j].properties.value = shedValue;
+							break;
+						}
+					}
+				}
+				console.log(json);
+				var maxCD = d3.max(ageByCD, function(d){ return d.values; })
+				var minCD = d3.min(ageByCD, function(d){ return d.values; })
+				console.log(maxCD);
+				console.log(minCD);
+			
+				function getGraduatedColor(d) {
+					var mapScale = chroma.scale(['#D8EAED','#285578'])
+						.classes([1,50,100,250,400,500]);
+						
+					return mapScale(d)
+
+					
+				}			
+
+				function polystyle(feature) {
+					return {
+						weight: 2,
+						color: '#FFFFFF',  //Outline color
+						fillOpacity: 0.9,
+						fillColor: getGraduatedColor(feature.properties.value),
+						className: sheds_CD
+					};
+				}
+
+				var addGeojson = function() {
+					var commDistSheds = L.geoJson(json, {
+						style: polystyle,
+						onEachFeature: function (feature, layer) {
+
+							//check if CD has a value
+							var val = feature.properties.value;
+							if(val){
+								layer.bindPopup('<p>COMMUNITY DISTRICT: ' +feature.properties.boro_cd+ '</br># ACTIVE SHEDS: '+feature.properties.value+'</p>');	
+							} else{
+								layer.bindPopup('<p>COMMUNITY DISTRICT: ' +feature.properties.boro_cd+ '</br># ACTIVE SHEDS: 0 </p>');	
+							}
+							layer.on('mouseover', function() { this.setStyle({'color': '#eef442', 'weight':'5'});});
+							layer.on('mouseout', function() { this.setStyle({'color': '#FFFFFF', 'weight':'2'});});
+							layer.myTag = 'commSheds';
+							
+						}
+					}).addTo(map);
+					//map.setView([40.712824, -74.005999], 11);
+				}
+
+
+				var removeGeojson = function() {
+					map.eachLayer(function(layer) {
+						if(layer.myTag === 'commSheds') {
+							map.removeLayer(layer)
+						}
+					});
+				}
+				
+				removeGeojson();
+
+				var shedRadio = document.querySelector('input[id="radioShed"]');
+					cdRadio = document.querySelector('input[id="radioCD"]');
+
+				shedRadio.onchange = function(){
+						if(this.checked){
+							removeGeojson();
+							d3.selectAll(".pointShed").style("display", "block");
+							d3.selectAll(".legendShed").style("display", "block");	
+							d3.selectAll(".legendCD").style("display", "none");
+						}
+				}
+				cdRadio.onchange = function(){
+						if(this.checked){
+							addGeojson();
+							d3.selectAll(".pointShed").style("display", "none");
+							d3.selectAll(".legendShed").style("display", "none");	
+							d3.selectAll(".legendCD").style("display", "block");
+						}
+				}
+
+			});
+			
+			pointsOverlaySQFT.addTo(map);
+			
+			d3.selectAll(".pointShed").style("display", "block");
+			
+			legendShed.addTo(map);
+			legendCD.addTo(map);
+
+			d3.selectAll(".legendCD").style("display", "none");
+			d3.selectAll(".legendShed").style("display", "block");
+						
+
+		//CHARTS
+			
+			//TOTAL CITYWIDE SHEDS
+			totalSheds = data.map(function(d) { return d.jobNum });
+			console.log(totalSheds);
+			d3.select("#summary1_sheds").html(numberFormat(totalSheds.length));
+
+			
+
+			//AVG AGE
+			var shedsAvgAge = d3.mean(data,function(d) { return d.age; });
+			console.log(shedsAvgAge);
+			d3.select("#summary2_avgAge").html(numberFormat(shedsAvgAge));
+
+			//TOTAL LENGTH
+			var totalLength = d3.sum(data.map(function(d) { return d.shedFeet }));
+			console.log(totalLength);
+			d3.select("#summary3_feet").html(numberFormat(totalLength));
+			
+			//SHEDS PER BOROUGH			
+			var nestBoroSheds = d3.nest()
+				.key(function(d){return d.Borough;}).sortKeys(d3.ascending)
+				.rollup(function(v) { 
+					return v.length;
+				})
+				.entries(data)
+				console.log(nestBoroSheds);
+				shedBoroChart(nestBoroSheds);
+				
+				
+			//TOP 5 COMMUNITY DISTRICTS
+			var nestCD = d3.nest()
+				.key(function(d) { return d.CD; })
+				.rollup(function(v) {
+					return v.length;
+				})			
+				.entries(data)
+				.sort(function(a, b){ return d3.descending(a.values, b.values); }).slice(0,5);	
+			console.log(nestCD);
+			shedCDChart(nestCD);
+			
+			
+			//TOP 5 JOB SITES
+			var nestJob = d3.nest()
+				.key(function(d) { return d.appName; })
+				.rollup(function(v) {
+					return v.length;
+				})
+				.entries(data)
+				.sort(function(a, b){ return d3.descending(a.values, b.values); }).slice(0,5);	
+			console.log(nestJob);
+			shedAppChart(nestJob);
+			
+				
+			function shedBoroChart(data){
+				var shedBoroData = [
+					{
+						key: "totals",
+						values: []
+					}
+				];
+
+				// populate the empty object with your data
+				data.forEach(function (d){
+					d.values = +d.values
+					shedBoroData[0].values.push(d)
+				})     
+				
+				
+				nv.addGraph(function() {				
+					var chart = nv.models.discreteBarChart()
+						.x(function (d) {  
+							return d.key 
+						})
+						.y(function (d) { 
+							return d.values 
+						})
+						.duration(250)
+						.margin({top: 15, right: 10, bottom: 20, left: 50})
+						.color(['#547A95']);
+					chart.yAxis.tickFormat(d3.format('.2s'));
+					chart.yAxis
+						.axisLabel('# Active Sheds')
+						.axisLabelDistance(-15);
+					chart.xAxis.tickFormat(function(d){
+						if (typeof this != 'undefined') {
+						 var el = d3.select(this);
+						 var p = d3.select(this.parentNode);
+						 p.append("foreignObject")
+							.attr('x', -100)
+							.attr("width", 200)
+							.attr("height", 200)
+							.append("xhtml:p")
+							.attr('style','word-wrap: break-word; text-align:center; font: normal 10px sans-serif;')
+							.html(d);    
+							el.remove();
+							return d;
+						}
+					});		
+					
+					d3.select('#chart-boro-sheds svg')
+							.datum(shedBoroData)
+							.transition().duration(250)
+							.call(chart);
+					nv.utils.windowResize(chart.update);
+					return chart;
+				});
+			}
+			
+			function shedCDChart(data){
+				var shedCDData = [
+					{
+						key: "totals",
+						values: []
+					}
+				];
+
+				// populate the empty object with your data
+				data.forEach(function (d){
+					d.values = +d.values
+					shedCDData[0].values.push(d)
+				})     
+				
+				
+				nv.addGraph(function() {				
+					var chart = nv.models.discreteBarChart()
+						.x(function (d) {  
+							return d.key 
+						})
+						.y(function (d) { 
+							return d.values 
+						})
+						.duration(250)
+						.margin({top: 15, right: 10, bottom: 20, left: 50})
+						.color(['#547A95']);
+					chart.yAxis.tickFormat(d3.format(','));
+					chart.yAxis
+						.axisLabel('# Active Sheds')
+						.axisLabelDistance(-15);
+					chart.xAxis.tickFormat(function(d){
+						if (typeof this != 'undefined') {
+						 var el = d3.select(this);
+						 var p = d3.select(this.parentNode);
+						 p.append("foreignObject")
+							.attr('x', -100)
+							.attr("width", 200)
+							.attr("height", 200)
+							.append("xhtml:p")
+							.attr('style','word-wrap: break-word; text-align:center; font: normal 10px sans-serif;')
+							.html(d);    
+							el.remove();
+							return d;
+						}
+					});										
+
+					d3.select('#cdsheds')
+							.datum(shedCDData)
+							.transition().duration(250)
+							.call(chart);
+					nv.utils.windowResize(chart.update);
+					return chart;
+				});
+			}
+			
+			function shedAppChart(data){
+				var shedAppData = [
+					{
+						key: "totals",
+						values: []
+					}
+				];
+
+				// populate the empty object with your data
+				data.forEach(function (d){
+					d.values = +d.values
+					shedAppData[0].values.push(d)
+				})     
+								
+					nv.addGraph(function() {				
+						var chart = nv.models.discreteBarChart()
+							.x(function (d) {  
+								return d.key 
+							})
+							.y(function (d) { 
+								return d.values 
+							})
+							.duration(250)
+							.margin({top: 15, right: 10, left: 50})
+							.color(['#547A95']);
+						chart.yAxis.tickFormat(d3.format('.2s'));
+						chart.yAxis
+							.axisLabel('# Active Sheds')
+							.axisLabelDistance(-15);
+						chart.xAxis.axisLabelDistance(10);
+						chart.xAxis.tickFormat(function(d){
+							if (typeof this != 'undefined') {
+							var el = d3.select(this);
+							var p = d3.select(this.parentNode);
+							p.append("foreignObject")
+								.attr('x', -35)
+								.attr("width", 70)
+								.attr("height", 200)
+								.append("xhtml:p")
+								.attr('style','word-wrap: break-word; text-align:center; font: normal 10px sans-serif; pointer-events: auto;')
+								.html(d);
+								el.remove();
+								return d;
+							}
+
+						});	
+											
+							d3.select('#shedApp')
+									.datum(shedAppData)
+									.transition().duration(250)
+									.call(chart);
+							nv.utils.windowResize(chart.update);
+							return chart;
+					}
+				);
+				
+			}
+			
+	});	
+	
+		
+}
+
+	
+	$('#dlData').click(function(e) {
+		e.preventDefault();  //stop the browser from following
+		window.location.href = 'https://nycdob.github.io/Maps/data/Active_Sheds2.csv';
+	});
+	
+});	
+
+</script>
+</body>
+</html>
