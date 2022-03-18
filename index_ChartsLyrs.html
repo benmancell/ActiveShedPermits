@@ -766,7 +766,7 @@ function ready(){
 			});
 			
 
-			$.getJSON("data/CommunityDistricts.json",function(json){
+			$.getJSON("https://nycdob.github.io/ActiveShedPermits/data/CommunityDistricts.json",function(json){
 
 				var ageByCD = d3.nest()
 					.key(function(d) { return d.CD; })
